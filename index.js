@@ -15,21 +15,23 @@ async function contractcall() {
     address: ownerAddr,
   });
 
-  const gasPrice = parseInt((await web3.eth.getGasPrice()) * 1.2);
+  const gasPrice = parseInt((await web3.eth.getGasPrice()) * 1.5);
+  const nonce = (await web3.eth.getTransactionCount(ownerAddr)) + 1;
   console.log(`Gas price is ${gasPrice}`);
 
   console.log("Multi harvest started.");
-  const harvest = async (contractAddr) => {
+  const harvest = async (contractAddr, nonce) => {
     const contract = new web3.eth.Contract(abi, contractAddr);
     await contract.methods.harvest().send({
       from: ownerAddr,
       gasPrice,
       gas: 10000000,
+      nonce,
     });
   };
   for (let i = 0, ni = contractAddrs.length; i < ni; i++) {
     console.log("Harvest: " + contractAddrs[i]);
-    await harvest(contractAddrs[i].trim());
+    await harvest(contractAddrs[i].trim(), nonce + i);
   }
   console.log("Multi harvest completed.");
 }
