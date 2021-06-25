@@ -14,25 +14,24 @@ async function contractcall() {
     privateKey: ownerPrivKey,
     address: ownerAddr,
   });
-  
-  const gasPrice = await web3.eth.getGasPrice();
+
+  const gasPrice = parseInt((await web3.eth.getGasPrice()) * 1.2);
   console.log(`Gas price is ${gasPrice}`);
 
-  console.log('Multi harvest started.');
+  console.log("Multi harvest started.");
   const harvest = async (contractAddr) => {
     const contract = new web3.eth.Contract(abi, contractAddr);
     await contract.methods.harvest().send({
       from: ownerAddr,
       gasPrice,
-      gas: 5000000,
+      gas: 10000000,
     });
-  }
-  const multiHarvest = [];
+  };
   for (let i = 0, ni = contractAddrs.length; i < ni; i++) {
-    multiHarvest.push(harvest(contractAddrs[i].trim()))
+    console.log("Harvest: " + contractAddrs[i]);
+    await harvest(contractAddrs[i].trim());
   }
-  await Promise.all(multiHarvest);
-  console.log('Multi harvest completed.');
+  console.log("Multi harvest completed.");
 }
 
 contractcall();
